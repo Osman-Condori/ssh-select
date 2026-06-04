@@ -1,0 +1,19 @@
+# Editor backup and swap files
+*~
+.*.swp
+.swp
+
+# Logs and status files
+*.log
+
+# Debian packaging local build artifacts
+build/
+debian/.debhelper/
+debian/sshi/
+debian/files
+debian/patches/
+*.deb
+*.changes
+*.buildinfo
+*.dsc
+*.tar.gz
