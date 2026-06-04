@@ -1,10 +1,10 @@
-# sshi
+# ssh-select
 
 A lightweight, native Lua TUI manager for SSH configurations.
 
 ## Description
 
-**sshi** is a terminal-based utility designed for system administrators and developers who manage multiple remote servers. Built with modularity and performance in mind, it transforms your plain-text `~/.ssh/config` file into an interactive and secure Text User Interface (TUI) control panel, running directly in your console with an insignificant resource footprint.
+**ssh-select** is a terminal-based utility designed for system administrators and developers who manage multiple remote servers. Built with modularity and performance in mind, it transforms your plain-text `~/.ssh/config` file into an interactive and secure Text User Interface (TUI) control panel, running directly in your console with an insignificant resource footprint.
 
 ## Features
 
@@ -26,7 +26,7 @@ The project is structured into three independent Lua modules to ensure clean cod
 
 ## Dependencies
 
-To run or build `sshi`, you will need:
+To run or build `ssh-select`, you will need:
 
 * **Lua** (5.3 or higher recommended)
 * **lua-curses** (`lcurses` bindings)
