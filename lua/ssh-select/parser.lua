@@ -36,52 +36,51 @@ function Parser.parsear(filepath)
         -- Ignore empty lines and comments starting with '#'
         if line ~= "" and not line:match("^#") then
             
-            -- Detect "Host <alias>" directive (Case Insensitive)
-            local host_alias = line:match("^[Hh][Oo][Ss][Tt]%s+(.+)$")
-            
-            if host_alias then
-                -- Ignore the global wildcard '*' to prevent it from showing up in the TUI
-                if host_alias ~= "*" then
-                    -- If a host block was already being processed, save it first
-                    if current_host then
-                        table.insert(hosts, current_host)
-                    end
-                    -- Initialize a new container with safe default values
-                    current_host = {
-                        alias = host_alias,
-                        hostname = "Unknown",
-                        user = default_user,
-                        port = "22",
-                        identity_file = "None"
-                    }
-                else
-                    -- If it's a global "Host *" block, close the current container
-                    -- to prevent global directives from polluting the last valid host
-                    if current_host then
-                        table.insert(hosts, current_host)
-                        current_host = nil
-                    end
-                end
-            
-            -- If we are inside a valid Host block, collect its properties
-            elseif current_host then
-                
-                -- Capture HostName
+            -- 1. Check sub-directives FIRST to avoid "HostName" collisions with "Host"
+            if current_host and line:match("^[Hh][Oo][Ss][Tt][Nn][Aa][Mm][Ee]%s+") then
                 local h_name = line:match("^[Hh][Oo][Ss][Tt][Nn][Aa][Mm][Ee]%s+(.+)$")
                 if h_name then current_host.hostname = trim(h_name) end
 
-                -- Capture User
+            elseif current_host and line:match("^[Uu][Ss][Ee][Rr]%s+") then
                 local u_name = line:match("^[Uu][Ss][Ee][Rr]%s+(.+)$")
                 if u_name then current_host.user = trim(u_name) end
 
-                -- Capture Port
+            elseif current_host and line:match("^[Pp][Oo][Rr][Tt]%s+") then
                 local port = line:match("^[Pp][Oo][Rr][Tt]%s+(.+)$")
                 if port then current_host.port = trim(port) end
 
-                -- Capture IdentityFile (Private key)
+            elseif current_host and line:match("^[Ii][Dd][Ee][Nn][Tt][Ii][Tt][Yy][Ff][Ii][Ll][Ee]%s+") then
                 local id_file = line:match("^[Ii][Dd][Ee][Nn][Tt][Ii][Tt][Yy][Ff][Ii][Ll][Ee]%s+(.+)$")
                 if id_file then current_host.identity_file = trim(id_file) end
+
+            -- 2. If it's not a sub-directive, check if it's a new "Host" block declaration
+            else
+                local host_alias = line:match("^[Hh][Oo][Ss][Tt]%s+(.+)$")
+                if host_alias then
+                    -- Ignore the global wildcard '*' to prevent it from showing up in the TUI
+                    if host_alias ~= "*" then
+                        -- If a host block was already being processed, save it first
+                        if current_host then
+                            table.insert(hosts, current_host)
+                        end
+                        -- Initialize a new container with safe default values
+                        current_host = {
+                            alias = host_alias,
+                            hostname = "Unknown",
+                            user = default_user,
+                            port = "22",
+                            identity_file = "None"
+                        }
+                    else
+                        -- If it's a global "Host *" block, close the current container
+                        if current_host then
+                            table.insert(hosts, current_host)
+                            current_host = nil
+                        end
+                    end
+                end
             end
+
         end
     end
 
